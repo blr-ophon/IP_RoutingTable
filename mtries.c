@@ -9,10 +9,10 @@ static bool BIT(uint32_t addr, uint8_t bit_n){
 
 int main(void){
     RouteNode *root = NULL;
-    RNode_insert(&root, 0x210f10f1);
-    RNode_insert(&root, 0x31020304);
-    RNode_insert(&root, 0xea0fa0fa);
-    RNode_insert(&root, 0x01000002);
+    RNode_insert(&root, 0x20000000);
+    RNode_insert(&root, 0x30000000);
+    RNode_insert(&root, 0xe0000000);
+    //RNode_insert(&root, 0x01000002);
     RNode_print(root);
     return 0;
 }
@@ -70,24 +70,6 @@ RouteNode *RNode_split(RouteNode *node, uint32_t newaddr, int i_diff_bit){
     new_parent->child[diff_bit]->prefix = newaddr;           //TODO: mask prefix
                                                              
     return new_parent;
-    /*
-    //previous node 
-    node->child[!diff_bit] = RNode_create();
-    node->child[!diff_bit]->address = node->address;    //pass address to child
-    node->child[!diff_bit]->prefix_len = node->prefix_len;            
-    node->child[!diff_bit]->prefix = node->address;     //TODO: mask prefix
-                                                        
-    //parent node 
-    node->prefix_len = 32 - (i_diff_bit+1);
-    node->prefix = node->address;                       //TODO: mask prefix
-    node->address = 0;                                  //clear parent address
-
-    //new node
-    node->child[diff_bit] = RNode_create();
-    node->child[diff_bit]->address = newaddr;
-    node->child[diff_bit]->prefix_len = 32;            //leafs have full prefix len
-    node->child[diff_bit]->prefix = newaddr;           //TODO: mask prefix
-    */
 }
 
 void RNode_insert(RouteNode **root, uint32_t addr){
@@ -114,7 +96,8 @@ void RNode_insert(RouteNode **root, uint32_t addr){
             if(BIT(addr,i) != BIT(p->prefix,i)){
                 //split node and make parent point to it
                 if(parent){
-                    parent->child[BIT(addr,i-1)] = RNode_split(p, addr, i);
+                    //i + 1 for previous bit
+                    parent->child[BIT(addr,i+1)] = RNode_split(p, addr, i);
                     return;
                 }else{  //if parent is NULL, p is *root
                     *root = RNode_split(p, addr, i);
