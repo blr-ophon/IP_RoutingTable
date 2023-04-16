@@ -35,7 +35,7 @@ void RNode_printrec(RouteNode *node);
 
 void RNode_print(RouteNode *root);
 
-void RNode_split(RouteNode *node, uint32_t newaddr, int i_diff_bit);
+RouteNode *RNode_split(RouteNode *node, uint32_t newaddr, int i_diff_bit);
 
 //if dont care bits are needed, use a mask argument and compare masked bits
 //to p->child[BIT_X] to determine if node is traversed or new node is created
