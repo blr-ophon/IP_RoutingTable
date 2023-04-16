@@ -89,10 +89,13 @@ void RNode_insert(RouteNode **root, uint32_t addr){
         (*root)->child[0]->address = 0x00000000;
         (*root)->child[0]->prefix = 0x00000000;
         (*root)->child[0]->prefix_len = 32;
+        (*root)->child[0]->parent = *root;
+
         (*root)->child[1] = RNode_create(); 
-        (*root)->child[1]->address = 0x80000000;
-        (*root)->child[1]->prefix = 0x80000000;
+        (*root)->child[1]->address = 0xffffffff;    
+        (*root)->child[1]->prefix = 0xffffffff;
         (*root)->child[1]->prefix_len = 32;
+        (*root)->child[1]->parent = *root;
     }
 
     RouteNode *parent = NULL;

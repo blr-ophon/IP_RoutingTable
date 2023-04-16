@@ -23,7 +23,7 @@ typedef struct route_node{
     //uint32_t wildcard;
     uint32_t prefix;
     uint16_t prefix_len;
-    //struct route_node *parent; 
+    struct route_node *parent; 
     struct route_node *child[BIT_TYPE_MAX]; 
     //void *data;
 }RouteNode;
