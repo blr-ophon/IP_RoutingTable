@@ -21,7 +21,8 @@ typedef enum{
 typedef struct route_node{
     uint32_t address;           //only leaf nodes carry the address
     //uint32_t wildcard;
-    //uint16_t prefix_len;
+    uint32_t prefix;
+    uint16_t prefix_len;
     //struct route_node *parent; 
     struct route_node *child[BIT_TYPE_MAX]; 
     //void *data;
@@ -34,7 +35,7 @@ void RNode_printrec(RouteNode *node);
 
 void RNode_print(RouteNode *root);
 
-void RNode_split(RouteNode *node, uint32_t newaddr, bool bit_i);
+void RNode_split(RouteNode *node, uint32_t newaddr, int i_diff_bit);
 
 //if dont care bits are needed, use a mask argument and compare masked bits
 //to p->child[BIT_X] to determine if node is traversed or new node is created
