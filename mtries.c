@@ -11,8 +11,10 @@ int main(void){
     RouteNode *root = NULL;
     RNode_insert(&root, 0x20000000);
     RNode_insert(&root, 0x30000000);
+    RNode_insert(&root, 0x40000000);
     RNode_insert(&root, 0xe0000000);
-    //RNode_insert(&root, 0x01000002);
+    RNode_insert(&root, 0xe0000000);
+    RNode_search(&root, 0x20000000);
     RNode_print(root);
     return 0;
 }
@@ -79,9 +81,18 @@ void RNode_insert(RouteNode **root, uint32_t addr){
     //breaks loop
 
     if(*root == NULL){
-        //root start as leaf with prefix 0, address 0 and 32bit mask
+        //root start as leaf with prefix 0, address 0 and 0bit mask
         *root = RNode_create();
-        (*root)->prefix_len = 32;   
+        //Create 2 leaf nodes, one starting with 0 and other starting with 1, else the root would
+        //split everytime a node starting with 0 would be inserted
+        (*root)->child[0] = RNode_create(); 
+        (*root)->child[0]->address = 0x00000000;
+        (*root)->child[0]->prefix = 0x00000000;
+        (*root)->child[0]->prefix_len = 32;
+        (*root)->child[1] = RNode_create(); 
+        (*root)->child[1]->address = 0x80000000;
+        (*root)->child[1]->prefix = 0x80000000;
+        (*root)->child[1]->prefix_len = 32;
     }
 
     RouteNode *parent = NULL;
@@ -111,34 +122,39 @@ void RNode_insert(RouteNode **root, uint32_t addr){
     }
 }
 
-//delete, search
-//  delete: there are no single-leafed branches, just delete desired leaf.
-//  search: traverse the tree according to address specified until a leaf is found.
-//          if it breaks before a leaf, it's not in the trie
+//traverse the tree according to address specified until a leaf is found.
+//if it breaks before a leaf, it's not in the trie
+void RNode_search(RouteNode **root, uint32_t addr){
 
-void RNode_delete(RouteNode **root, uint32_t addr){
-
-    RouteNode *parent = NULL;
     RouteNode *p = *root;
-    for(int i = 31; i >= 0; i--){
-        if(!p->child[BIT(addr, i)]){    //if empty child node
-            //create node
-            if(p->address == addr && parent){   
-                //keep other node in parent
-                parent->address = p->address;
-
-                //delete both leafs
-                free(parent->child[BIT(addr,i)]);
-                free(parent->child[!BIT(addr,i)]);
-                parent->child[BIT(addr,i)] = NULL;
-                parent->child[!BIT(addr,i)] = NULL;
-            } //else, node not present
+    for(int i = 31; i >= 0;){
+        //number of bits to be checked before advancing to next node.
+        //n = (current_bit) - (last bit to check) + 1(including last bit to check)
+                                                           
+        if(p->prefix_len == 32){
             break;
         }
-
+        int prefix_bits = i-(32 - p->prefix_len) + 1;       
+        for(int j = 0; j < prefix_bits; j++){
+            //look all bits in the prefix for a node
+            if(BIT(addr,i) != BIT(p->prefix,i)){
+                //NOT IN THE TRIE
+                printf("Not in the trie\n");
+                return;
+            }
+            i--;
+        }
         //go to next node
-        parent = p;
         p = p->child[BIT(addr,i)];
     }
-
+    if(p->address == addr){ 
+        printf("%x Found\n", addr);
+    }else{
+        printf("Not in the trie\n");
+    }
 }
+
+//delete, search
+//  delete: there are no single-leafed branches, just delete desired leaf.
+
+//Delete the leaf node and parent, make grandparent point to the other leaf

@@ -43,4 +43,6 @@ void RNode_insert(RouteNode **root, uint32_t addr);
 
 void RNode_delete(RouteNode **root, uint32_t addr);
 
+void RNode_search(RouteNode **root, uint32_t addr);
+
 #endif
