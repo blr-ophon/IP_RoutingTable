@@ -66,33 +66,54 @@ void RNode_print(RouteNode *root){
 }
 
 //split node into 2 and returns address of new parent node
-RouteNode *RNode_split(RouteNode *node, uint32_t newaddr, uint8_t mask_len, int i_diff_bit){
-    //TODO: use RouteNode **node with void return
+void RNode_split(RouteNode *node, uint32_t newaddr, uint8_t mask_len, int i_diff_bit){
+    printf("LEAF NODE: %x/%d\n", node->address, node->prefix_len);
     bool diff_bit = BIT(newaddr, i_diff_bit);
 
-    //create new parent with similar info from previous node
-    RouteNode *new_parent = RNode_create();
-    new_parent->address = 0;
-    new_parent->prefix_len = 32 - (i_diff_bit+1);
-    new_parent->prefix = mask_addr(node->prefix, new_parent->prefix_len);
-    new_parent->child[!diff_bit] = node;        //unchanged child points to previous node
-    new_parent->parent = node->parent;          
-    node->parent = new_parent;
 
-    //new node
-    new_parent->child[diff_bit] = RNode_create();
-    new_parent->child[diff_bit]->parent = new_parent;
-    new_parent->child[diff_bit]->address = newaddr;
-    new_parent->child[diff_bit]->prefix_len = mask_len;            //leafs have full prefix len
-    new_parent->child[diff_bit]->prefix = mask_addr(newaddr, mask_len);           //TODO: mask prefix
-                                                             
-    printf("NODE SPLIT:\n%x/%d: %x | %x\n\n",
-            new_parent->prefix,
-            new_parent->prefix_len,
-            new_parent->child[BIT_0]->address,
-            new_parent->child[BIT_1]->address
+    //child node keeping previous info
+    RouteNode *keepingNode = RNode_create();
+    memcpy(keepingNode, node, sizeof(RouteNode));
+    node->prefix_len = 32 - (i_diff_bit+1);
+    node->child[!diff_bit] = keepingNode;
+    node->address = 0;
+
+    //child node with new info
+    RouteNode *newNode = RNode_create();
+    node->child[diff_bit] = newNode; 
+    newNode->address = newaddr;
+    newNode->prefix_len = mask_len;            //leafs have full prefix len
+    newNode->prefix = mask_addr(newaddr, mask_len);           //TODO: mask prefix
+
+    printf("BECOMES:\n%x/%d: %x | %x\n\n",
+            node->prefix,
+            node->prefix_len,
+            node->child[BIT_0]->address,
+            node->child[BIT_1]->address
             );
-    return new_parent;
+    //create new parent with similar info from previous node
+    //RouteNode *new_parent = RNode_create();
+    //new_parent->address = 0;
+    //new_parent->prefix_len = 32 - (i_diff_bit+1);
+    //new_parent->prefix = mask_addr((*node)->prefix, new_parent->prefix_len);
+
+    ////child with unchanged info (previous node);
+    //new_parent->child[!diff_bit] = *node;        
+
+    ////new node
+    //new_parent->child[diff_bit] = RNode_create();
+    ////new_parent->child[diff_bit]->parent = new_parent;
+    //new_parent->child[diff_bit]->address = newaddr;
+    //new_parent->child[diff_bit]->prefix_len = mask_len;            //leafs have full prefix len
+    //new_parent->child[diff_bit]->prefix = mask_addr(newaddr, mask_len);           //TODO: mask prefix
+    //                                                         
+    //printf("BECOMES:\n%x/%d: %x | %x\n\n",
+    //        new_parent->prefix,
+    //        new_parent->prefix_len,
+    //        new_parent->child[BIT_0]->address,
+    //        new_parent->child[BIT_1]->address
+    //        );
+    //*node = new_parent;
 }
 
 void RNode_insert(RouteNode **root, uint32_t addr, uint8_t mask_len){
@@ -112,16 +133,15 @@ void RNode_insert(RouteNode **root, uint32_t addr, uint8_t mask_len){
         (*root)->child[BIT_0]->address = 0x00000000;
         (*root)->child[BIT_0]->prefix = 0x00000000;
         (*root)->child[BIT_0]->prefix_len = 32;
-        (*root)->child[BIT_0]->parent = *root;
+        //(*root)->child[BIT_0]->parent = *root;
 
         (*root)->child[BIT_1] = RNode_create(); 
         (*root)->child[BIT_1]->address = 0xffffffff;    
         (*root)->child[BIT_1]->prefix = 0xffffffff;
         (*root)->child[BIT_1]->prefix_len = 32;
-        (*root)->child[BIT_1]->parent = *root;
+        //(*root)->child[BIT_1]->parent = *root;
     }
 
-    //RouteNode *parent = NULL;
     RouteNode *p = *root;
     //for(int i = 31; i >= (32-mask_len);){
     for(int i = 31; i >= 0;){
@@ -134,22 +154,17 @@ void RNode_insert(RouteNode **root, uint32_t addr, uint8_t mask_len){
             //look all bits in the prefix for a node
             if(BIT(addr,i) != BIT(p->prefix,i)){
                 //split node and make parent point to it
-                //if(parent){
-                if(p->parent){
-                    //i + 2 for previous bit
-                    RouteNode *tmp = p->parent;
-                    p = RNode_split(p, addr, mask_len, i);
-                    tmp->child[BIT(addr,i+2)] = p;
-                    //parent->child[BIT(addr,i+1)] = RNode_split(p, addr, mask_len, i);
-                    return;
-                }else{  //if parent is NULL, p is *root
-                    *root = RNode_split(p, addr, mask_len, i);
-                }
+                RNode_split(p, addr, mask_len, i);
+                return;
             }
             i--;
         }
         //go to next node
-        //parent = p;
+        if(p->child[BIT(addr,i)] == NULL){
+            //subnet has higher mask than deepest leaf. 
+            RNode_split(p, addr, mask_len, i);
+            return;
+        }
         p = p->child[BIT(addr,i)];
     }
 }
