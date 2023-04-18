@@ -37,11 +37,11 @@ void RNode_print(RouteNode *root);
 
 void RNode_split(RouteNode *node, uint32_t newaddr, uint8_t mask_len, int i_diff_bit);
 
-//if dont care bits are needed, use a mask argument and compare masked bits
-//to p->child[BIT_X] to determine if node is traversed or new node is created
 void RNode_insert(RouteNode **root, uint32_t addr, uint8_t mask_len);
 
 void RNode_delete(RouteNode **root, uint32_t addr);
+
+RouteNode *RNode_retrieve(RouteNode **root, uint32_t addr, uint8_t mask_len);
 
 RouteNode *RNode_search(RouteNode **root, uint32_t addr);
 
