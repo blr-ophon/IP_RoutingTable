@@ -1,5 +1,5 @@
-#ifndef NMTRIES_H
-#define NMTRIES_H
+#ifndef L3TABLE_H
+#define L3TABLE_H
 
 #include <stdlib.h>
 #include <stdio.h>
