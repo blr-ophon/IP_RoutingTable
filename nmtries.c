@@ -1,16 +1,21 @@
 #include "nmtries.h"
+#include <time.h>
 
 static bool BIT(uint8_t bit_n, uint32_t addr){ 
     return (addr & (1 << bit_n));
 }
 
+static void stress_test(RouteNode **root){
+    srand(time(NULL));
+    for(int i = 0; i < 128; i++){
+        RNode_insert(root, (uint32_t)rand(), rand()%32);
+    }
+}
+
 int main(void){
     RouteNode *root = NULL;
-    RNode_insert(&root, 0x2f000000, 6);
-    RNode_insert(&root, 0x2f000000, 3);
-    RNode_insert(&root, 0x2f000000, 7);
-    RNode_insert(&root, 0x20000000, 32);
-    RNode_insert(&root, 0x30000000, 32);
+    stress_test(&root);
+    //RNode_insert(&root, 0x00000001, 32);
     RNode_print(root);
 
     struct RN_addr_in addr_in;
@@ -28,7 +33,13 @@ void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
 
     uint32_t newprefix = *prefix;
     if(node->subnet_end){
-        printf("Subnet: %x/%d\n", newprefix, length);
+        char addr_str[INET_ADDRSTRLEN] = {0};
+        struct in_addr iaddr;
+        iaddr.s_addr = htonl(*prefix);
+
+        inet_ntop(AF_INET, &iaddr, addr_str, INET_ADDRSTRLEN);
+        printf("-- %s/%d (%#x)\n", addr_str, length, newprefix);
+        //printf("Subnet: %x/%d\n", newprefix, length);
     }
     for(int i = 0; i < BIT_TYPES; i++){   
         if(node->child[i] != NULL){

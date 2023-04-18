@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <arpa/inet.h>
+
 #define BIT_TYPES 2
 
 typedef enum{
