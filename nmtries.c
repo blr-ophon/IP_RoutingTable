@@ -20,18 +20,20 @@ int main(void){
     return 0;
 }
 
-void RNode_printrec(RouteNode *node, unsigned char *prefix, int length){
-    uint8_t newprefix[length+2];            //length + next char + \0
-    memcpy(newprefix, prefix, length);
-    newprefix[length+1] = 0;                //\0
+void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
+    //uint8_t newprefix[length+2];            //length + next char + \0
+    //memcpy(newprefix, prefix, length);
+    //newprefix[length+1] = 0;                //\0
 
     if(node->subnet_end){
-        printf("Subnet: %s/%d\n", prefix, length);
+        printf("Subnet: %x/%d\n", *prefix, length);
     }
     for(int i = 0; i < BIT_TYPES; i++){   
         if(node->child[i] != NULL){
-            newprefix[length] = i + '0';          //next char
-            RNode_printrec(node->child[i], newprefix, length +1);
+            //newprefix[length] = i + '0';          //next char
+            //RNode_printrec(node->child[i], newprefix, length +1);
+            (*prefix) |= (i << (31-length));
+            RNode_printrec(node->child[i], prefix, length +1);
         }
     }
 }
@@ -41,7 +43,8 @@ void RNode_print(RouteNode *root){
         printf("Empty trie\n");
         return;
     }
-    RNode_printrec(root, NULL, 0);
+    uint32_t prefix = 0;
+    RNode_printrec(root, &prefix, 0);
 }
 
 RouteNode *RNode_create(void){

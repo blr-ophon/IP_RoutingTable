@@ -34,7 +34,8 @@ void RNode_delete(RouteNode **root, char *subnet);
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in);
 
-void RNode_printrec(RouteNode *node, unsigned char *prefix, int length);
+//void RNode_printrec(RouteNode *node, unsigned char *prefix, int length);
+void RNode_printrec(RouteNode *node, uint32_t *prefix, int length);
 
 void RNode_print(RouteNode *root);
 
