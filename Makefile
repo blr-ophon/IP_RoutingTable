@@ -28,6 +28,6 @@ run: ${EXEC}
 	./$< 
 
 debug: ${EXEC}
-	cgdb --args ./$< 8.8.8.8 example.com AAAA
+	cgdb ./$< 
 
 

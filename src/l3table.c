@@ -15,7 +15,10 @@ static void stress_test(RouteNode **root){
 int main(void){
     RouteNode *root = NULL;
     stress_test(&root);
-    //RNode_insert(&root, 0x00000001, 32);
+    //RNode_insert(&root, 0x01130000, 32);
+    //RNode_insert(&root, 0xf1130000, 32);
+    RNode_insert(&root, 0xff000000, 4);
+    RNode_delete(&root, 0xff000000, 4);
     RNode_print(root);
 
     struct RN_addr_in addr_in;
@@ -121,7 +124,7 @@ void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr
 
 static bool RNode_hasChidren(RouteNode *node, BIT_TYPE exclude){
     //check if node has other children besides 'exclude'
-    for(int i = 0; i < BIT_TYPES; i++){
+    for(BIT_TYPE i = 0; i < BIT_TYPES; i++){
         if(i == exclude){
             continue;
         }
@@ -134,17 +137,18 @@ static bool RNode_hasChidren(RouteNode *node, BIT_TYPE exclude){
 }
 //
 void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len){
-    RouteNode *last = NULL;             //delete every node after this
                         
-    //find 'last' node to keep
+    //Traverse and find lowest last node that cant be deleted
     RouteNode *p = *root;
+    RouteNode *last = NULL;             //delete every node after this
     int tmp_i = 0;
     for(int i = 31; i >= (32-mask_len); i--){
         bool isEnd = p->subnet_end;                        
         bool hasChildren = RNode_hasChidren(p, BIT(i,addr));   
-        bool isCurrent = i == (32-mask_len);          //end of (soon to be) deleted string
-        if(hasChildren || (isEnd && !isCurrent)){  //is terminal os has children
-            if(isEnd && hasChildren){   //special case where nothing is deleted
+        bool isCurrent = i == (32-mask_len);            //end of (soon to be) deleted string
+        if(hasChildren || (isEnd && !isCurrent)){       //is terminal or has children
+            if(isCurrent && hasChildren){   
+                //special case where nothing is deleted, just the end flag cleared
                 p->subnet_end = 0;
                 return;
             }
@@ -154,12 +158,15 @@ void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len){
         p = p->child[BIT(i,addr)];                   //go to new node
     }
 
+
     //clear pointer to deleted nodes in 'last'
-    p = last? last : *root;
+    p = last? last : *root;                             //if no previous node with children
+                                                        //or terminal is found, delete from root
     RouteNode *tmp = p->child[BIT(tmp_i, addr)];
     p->child[BIT(tmp_i, addr)] = NULL;
     p = tmp;
-    tmp_i ++;
+    tmp_i --;
+
 
     //delete every node after last
     for(int i = tmp_i; i >= (32-mask_len); i--){    
