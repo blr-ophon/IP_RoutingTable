@@ -18,12 +18,17 @@ int main(void){
     insert_random_addrs(&root, 128);
     RNode_insert(&root, 0xff000000, 4);
     RNode_delete(&root, 0xff000000, 4);
+
     RNode_print(root);
 
     struct RN_addr_in addr_in;
     memset(&addr_in, 0, sizeof(addr_in));
     RNode_retrieve(root, 0x2f000000, 7, &addr_in);
     printf("Retrieved: %x/%d\n", addr_in.addr, addr_in.mask_len);
+
+    if(RNode_search(root, 0xff000000, 4)){
+        printf("Found\n");
+    }
     return 0;
 }
 
@@ -169,17 +174,16 @@ void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len){
 }
 
 
-//bool RNode_search(RouteNode *root, char *str){
-//    uint8_t *cstr = (uint8_t*) str;    //casted str
-//
-//    RouteNode *p = root;
-//    for(int i = 0; i < strlen(str); i++){   //for each char in str, traverse
-//        if(p->children[cstr[i]] == NULL){   //and check if its present
-//            return false;
-//        }
-//        p = p->children[cstr[i]];
-//    }
-//
-//    //if traversal is complete and there is an end flag, return true
-//    return p->str_end;      
-//}
+bool RNode_search(RouteNode *root, uint32_t addr, uint8_t mask_len){
+
+    RouteNode *p = root;
+    for(int i = 31; i >= (32-mask_len); i--){   //for each char in str, traverse
+        if(p->child[BIT(i,addr)] == NULL){   //and check if its present
+            return false;
+        }
+        p = p->child[BIT(i,addr)];
+    }
+
+    //if traversal is complete and there is an end flag, return true
+    return p->subnet_end;      
+}

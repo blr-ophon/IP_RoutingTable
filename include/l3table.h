@@ -28,16 +28,17 @@ typedef struct route_node{
 }RouteNode;
 
 
+
 RouteNode *RNode_create(void);
 
 void RNode_insert(RouteNode **root, uint32_t addr, int mask_len);
 
-//void RNode_delete(RouteNode **root, char *subnet);
 void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len);
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in);
 
-//void RNode_printrec(RouteNode *node, unsigned char *prefix, int length);
+bool RNode_search(RouteNode *root, uint32_t addr, uint8_t mask_len);
+
 void RNode_printrec(RouteNode *node, uint32_t *prefix, int length);
 
 void RNode_print(RouteNode *root);
