@@ -30,7 +30,8 @@ RouteNode *RNode_create(void);
 
 void RNode_insert(RouteNode **root, uint32_t addr, int mask_len);
 
-void RNode_delete(RouteNode **root, char *subnet);
+//void RNode_delete(RouteNode **root, char *subnet);
+void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len);
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in);
 

@@ -20,20 +20,22 @@ int main(void){
     return 0;
 }
 
+
 void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
     //uint8_t newprefix[length+2];            //length + next char + \0
     //memcpy(newprefix, prefix, length);
     //newprefix[length+1] = 0;                //\0
 
+    uint32_t newprefix = *prefix;
     if(node->subnet_end){
-        printf("Subnet: %x/%d\n", *prefix, length);
+        printf("Subnet: %x/%d\n", newprefix, length);
     }
     for(int i = 0; i < BIT_TYPES; i++){   
         if(node->child[i] != NULL){
             //newprefix[length] = i + '0';          //next char
             //RNode_printrec(node->child[i], newprefix, length +1);
-            (*prefix) |= (i << (31-length));
-            RNode_printrec(node->child[i], prefix, length +1);
+            newprefix |= (i << (31-length));
+            RNode_printrec(node->child[i], &newprefix, length +1);
         }
     }
 }
@@ -106,56 +108,55 @@ void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr
     addr_in->mask_len= ret_mask_len;
 }
 
-//static bool RNode_hasChidren(RouteNode *node, uint8_t exclude){
-//    //check if node has other children besides 'exclude'
-//    for(int i = 0; i < ASCII_TOTAL; i++){
-//        if(i == exclude){
-//            continue;
-//        }
-//        if(node->children[i]){
-//            return true;
-//        }
-//    }
+static bool RNode_hasChidren(RouteNode *node, BIT_TYPE exclude){
+    //check if node has other children besides 'exclude'
+    for(int i = 0; i < BIT_TYPES; i++){
+        if(i == exclude){
+            continue;
+        }
+        if(node->child[i]){
+            return true;
+        }
+    }
+
+    return false;
+}
 //
-//    return false;
-//}
-//
-//void RNode_delete(RouteNode **root, char *str){
-//    uint8_t *cstr = (uint8_t*) str;    //casted str
-//    RouteNode *last = NULL;             //delete every node after this
-//                        
-//    //find 'last' node to keep
-//    RouteNode *p = *root;
-//    int tmp_i = 0;
-//    for(int i = 0; i <= strlen(str); i++){
-//        bool isEnd = p->str_end;                        
-//        bool hasChildren = RNode_hasChidren(p, cstr[i]);   
-//        bool isCurrent = i == strlen(str);          //end of deleted string
-//        if(hasChildren || (isEnd && !isCurrent)){  //is terminal os has children
-//            if(isEnd && hasChildren){   //special case where nothing is deleted
-//                p->str_end = 0;
-//                return;
-//            }
-//            last = p;
-//            tmp_i = i;
-//        }
-//        p = p->children[cstr[i]];                   //go to new node
-//    }
-//
-//    //clear pointer to deleted nodes in 'last'
-//    p = last? last : *root;
-//    RouteNode *tmp = p->children[cstr[tmp_i]];
-//    p->children[cstr[tmp_i]] = NULL;
-//    p = tmp;
-//    tmp_i ++;
-//
-//    //delete every node after last
-//    for(int i = tmp_i; i <= strlen(str); i++){    
-//        tmp = p->children[cstr[i]];
-//        free(p);
-//        p = tmp;
-//    }
-//}
+void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len){
+    RouteNode *last = NULL;             //delete every node after this
+                        
+    //find 'last' node to keep
+    RouteNode *p = *root;
+    int tmp_i = 0;
+    for(int i = 31; i >= (32-mask_len); i--){
+        bool isEnd = p->subnet_end;                        
+        bool hasChildren = RNode_hasChidren(p, BIT(i,addr));   
+        bool isCurrent = i == (32-mask_len);          //end of (soon to be) deleted string
+        if(hasChildren || (isEnd && !isCurrent)){  //is terminal os has children
+            if(isEnd && hasChildren){   //special case where nothing is deleted
+                p->subnet_end = 0;
+                return;
+            }
+            last = p;
+            tmp_i = i;
+        }
+        p = p->child[BIT(i,addr)];                   //go to new node
+    }
+
+    //clear pointer to deleted nodes in 'last'
+    p = last? last : *root;
+    RouteNode *tmp = p->child[BIT(tmp_i, addr)];
+    p->child[BIT(tmp_i, addr)] = NULL;
+    p = tmp;
+    tmp_i ++;
+
+    //delete every node after last
+    for(int i = tmp_i; i >= (32-mask_len); i--){    
+        tmp = p->child[BIT(i, addr)];
+        free(p);
+        p = tmp;
+    }
+}
 
 
 //bool RNode_search(RouteNode *root, char *str){
