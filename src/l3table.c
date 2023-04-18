@@ -5,18 +5,17 @@ static bool BIT(uint8_t bit_n, uint32_t addr){
     return (addr & (1 << bit_n));
 }
 
-static void stress_test(RouteNode **root){
+static void insert_random_addrs(RouteNode **root, size_t n){
+    //used for testing
     srand(time(NULL));
-    for(int i = 0; i < 128; i++){
+    for(size_t i = 0; i < n; i++){
         RNode_insert(root, (uint32_t)rand(), rand()%32);
     }
 }
 
 int main(void){
     RouteNode *root = NULL;
-    stress_test(&root);
-    //RNode_insert(&root, 0x01130000, 32);
-    //RNode_insert(&root, 0xf1130000, 32);
+    insert_random_addrs(&root, 128);
     RNode_insert(&root, 0xff000000, 4);
     RNode_delete(&root, 0xff000000, 4);
     RNode_print(root);
@@ -30,9 +29,6 @@ int main(void){
 
 
 void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
-    //uint8_t newprefix[length+2];            //length + next char + \0
-    //memcpy(newprefix, prefix, length);
-    //newprefix[length+1] = 0;                //\0
 
     uint32_t newprefix = *prefix;
     if(node->subnet_end){
@@ -46,8 +42,6 @@ void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
     }
     for(int i = 0; i < BIT_TYPES; i++){   
         if(node->child[i] != NULL){
-            //newprefix[length] = i + '0';          //next char
-            //RNode_printrec(node->child[i], newprefix, length +1);
             newprefix |= (i << (31-length));
             RNode_printrec(node->child[i], &newprefix, length +1);
         }
@@ -69,11 +63,9 @@ RouteNode *RNode_create(void){
 }
 
 
-//void RNode_insert(RouteNode **root, char *subnet, int mask_len){
 void RNode_insert(RouteNode **root, uint32_t addr, int mask_len){
     //TODO: parse address to 4 bytes
     //TODO: insert gateway
-    //uint32_t addr = atoi(subnet);
     if(*root == NULL){
         *root = RNode_create();
     }
@@ -135,7 +127,7 @@ static bool RNode_hasChidren(RouteNode *node, BIT_TYPE exclude){
 
     return false;
 }
-//
+
 void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len){
                         
     //Traverse and find lowest last node that cant be deleted
