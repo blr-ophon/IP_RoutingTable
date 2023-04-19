@@ -12,8 +12,6 @@ int main(void) {
     //cgraph
     Agraph_t *graph = agopen("G", Agdirected, NULL);
 
-    //graph style 
-    agsafeset(graph, "bgcolor", "blue", "");
 
     Agnode_t *n1 = agnode(graph, "1", 1);
     Agnode_t *n2 = agnode(graph, "2", 1);
@@ -21,11 +19,14 @@ int main(void) {
     agedge(graph, n1, n2, NULL, 1);
     agedge(graph, n2, n3, NULL, 1);
 
-        agattr(graph, AGNODE, "style", "filled");
-            agattr(graph, AGNODE, "fillcolor", "green");
-                agattr(graph, AGNODE, "fontcolor", "white");
-                    agattr(graph, AGNODE, "shape", "circle");
-                        agattr(graph, AGEDGE, "color", "white");
+    //graph style 
+    agattr(graph, AGNODE, "style", "filled");
+    agattr(graph, AGNODE, "fillcolor", "#030769");
+    agattr(graph, AGNODE, "fontcolor", "#b1acc8");    
+    agattr(graph, AGNODE, "shape", "circle");       
+    agattr(graph, AGEDGE, "color", "#64d967");       
+    agattr(graph, AGNODE, "color", "#b2bfed");       
+    agsafeset(graph, "bgcolor", "black", "");      
 
 
 
