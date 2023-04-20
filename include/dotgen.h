@@ -4,8 +4,9 @@
 #include <graphviz/gvc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "simnet.h"
 
 //receive adjacency list array and creates a dot graph
-void dotgen(void);
+void Simnet_dotgen(struct Router *routers);
 
 #endif

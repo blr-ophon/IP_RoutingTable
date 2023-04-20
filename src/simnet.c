@@ -1,15 +1,39 @@
 #include "simnet.h"
+#include "dotgen.h"
 
-void simnet_init(void){
-   RouteLink routers[8]; 
-}
+
 
 int main(void){
-	RouteLink *rlink = NULL;
-    for(int i = 0; i < 10; i++){
-        Router_insertNeighbor(&rlink, i);
-    }
+    struct Router routers[ROUTER_TOTAL];
+    Simnet_init(routers);
+    Simnet_createGraph(routers);
     return 0;
+}
+
+//create a sample graph
+void Simnet_createGraph(struct Router *routers){
+    Router_insertDEdge(routers, 0, 1);
+    Router_insertDEdge(routers, 0, 4);
+    Router_insertDEdge(routers, 1, 2);
+    Router_insertDEdge(routers, 2, 3);
+    Router_insertDEdge(routers, 3, 4);
+    Router_insertDEdge(routers, 4, 1);
+    for(int i = 0; i < ROUTER_TOTAL; i++){
+        Router_printNeighbors(routers[i].neighbors);
+    }
+    Simnet_dotgen(routers);
+}
+
+void Simnet_init(struct Router *routers){
+    for(int i = 0; i < ROUTER_TOTAL; i++){
+        memset(&routers[i], 0, sizeof(struct Router));
+    }
+}
+
+//Insert double edge
+void Router_insertDEdge(struct Router *routers, int id1, int id2){
+    Router_insertNeighbor(&routers[id1].neighbors, id2);
+    Router_insertNeighbor(&routers[id2].neighbors, id1);
 }
 
 void Router_insertNeighbor(RouteLink **neighborList, int id){
@@ -33,7 +57,7 @@ void Router_insertNeighbor(RouteLink **neighborList, int id){
         newNode->next = tmp;
         previousNode->next = newNode;
     }
-    Router_printNeighbors(*neighborList);
+    //Router_printNeighbors(*neighborList);
 }
 
 void Router_printNeighbors(RouteLink *sPtr){
@@ -42,11 +66,10 @@ void Router_printNeighbors(RouteLink *sPtr){
 		printf("List is empty\n");
         return;
 	}else{
-		printf("\n");
 		while(tmp != NULL){
 			printf("%d -> ", tmp->node_id);
 			tmp = tmp->next;
 		}	
-		printf("NULL\n\n");
+		printf("NULL\n");
 	}	
 }

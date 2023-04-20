@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "l3table.h"
 
+#define ROUTER_TOTAL 5
 
 //Edges of an adjacency list
 typedef struct route_link{
@@ -20,11 +21,21 @@ typedef struct route_link{
 }RouteLink;
 
 struct Router{
-    int id;                     //position in the list array                    
+    //int id;                     //position in the list array                    
     RouteNode *Routing_table;   
     RouteLink *neighbors;       //adjacency list of neighbors
 };
 
+
+void Simnet_init(struct Router *routers);
+
+void Simnet_createGraph(struct Router *routers);
+
+void Router_insertDEdge(struct Router *routers, int id1, int id2);
+
+void Router_insertNeighbor(RouteLink **neighborList, int id);
+
+void Router_printNeighbors(RouteLink *sPtr);
 
 //Router will be stored in an array, where id is it's position, to
 //facilitate.
@@ -50,9 +61,6 @@ void graph_init(void);
 //insert all neighbors in adjacency list
 //call graph print in dotgen
 
-void Router_insertNeighbor(RouteLink **neighborList, int id);
-
-void Router_printNeighbors(RouteLink *sPtr);
 
 
 
