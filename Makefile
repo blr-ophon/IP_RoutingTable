@@ -25,7 +25,7 @@ ${BUILD_DIR}/%.o: ${SRC_DIR}/%.c ${HEADERS}
 clean:
 	rm -rf ${BUILD_DIR} ${EXEC}
 
-run: ${EXEC}
+testrun: ${EXEC}
 	./$< 
 
 debug: ${EXEC}
