@@ -25,13 +25,14 @@ typedef struct route_node{
     struct route_node *child[BIT_TYPES]; 
     bool subnet_end;    //marks end of known subnet
     uint32_t gateway;   //stores gateway for know subnet 
+    uint8_t gw_mask_len;   //stores gateway for know subnet 
 }RouteNode;
 
 
 
 RouteNode *RNode_create(void);
 
-void RNode_insert(RouteNode **root, uint32_t addr, int mask_len);
+void RNode_insert(RouteNode **root, uint32_t addr, int mask_len, uint32_t gateway, uint8_t gw_mask_len);
 
 void RNode_delete(RouteNode **root, uint32_t addr, uint8_t mask_len);
 

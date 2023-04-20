@@ -1,90 +1,37 @@
 #include "simnet.h"
 #include "dotgen.h"
-
-//shortest routes of all nodes to id. Using Dijkstra's algorithm
-void Router_SPF(struct Router *routers, int start_id){
-    struct table_entry{
-        int dist_to_id;
-        int pv_node;
-        bool visited;
-    };
-    //distance table
-    struct table_entry dist_table[ROUTER_TOTAL];
-    //set all entries
-    for(int i = 0; i < ROUTER_TOTAL; i++){
-        dist_table[i].dist_to_id = 9999;        //arbitrary high number
-        dist_table[i].pv_node = -1;        //arbitrary high number
-        dist_table[i].visited = false;        //arbitrary high number
-    }
-
-
-    //distance to itself is 0
-    dist_table[start_id].dist_to_id = 0;
-    dist_table[start_id].pv_node = start_id;
-
-    for(;;){
-
-        //use dist_table to find closest unvisited node to start
-        int closest_node = start_id;
-        int closest_dist = 9999;
-        for(int i = 0; i < ROUTER_TOTAL; i++){
-            if(!dist_table[i].visited && dist_table[i].dist_to_id < closest_dist){
-                closest_dist = dist_table[i].dist_to_id;
-                closest_node = i;
-            }
-        }
-
-        //end loop if there are no unvisited nodes anymore
-        if(closest_dist == 9999){
-            break;
-        }
-        
-        //visit closest node
-        dist_table[closest_node].visited = true;
-        RouteLink *p = routers[closest_node].neighbors;
-        for(;p != NULL; p = p->next){
-
-            //ignore node from which it came
-            if(p->node_id == dist_table[closest_node].pv_node){
-                continue;
-            }
-
-            //distance from start to this neighbor via closest_node
-            int neighbor_dist = closest_dist + p->weight;       
-            //if this distance is less then what was previously registered
-            if(neighbor_dist < dist_table[p->node_id].dist_to_id){
-                dist_table[p->node_id].dist_to_id = neighbor_dist;
-                dist_table[p->node_id].pv_node = closest_node;
-            }
-        }
-    }
-    printf("\nDIJKSTRA'S ALGORITHM TABLE\n");
-    for(int i = 0; i < ROUTER_TOTAL; i++){
-        printf("%d | %d | %d\n",
-                i,
-                dist_table[i].dist_to_id,
-                dist_table[i].pv_node
-              );
-    }
-}
+#include "spf.h"
 
 
 int main(void){
     struct Router routers[ROUTER_TOTAL];
     Simnet_init(routers);
     Simnet_createGraph(routers);
-    Router_SPF(routers, 3);
+    Router_SPF(routers, 0);
     return 0;
 }
 
 //create a sample graph
 void Simnet_createGraph(struct Router *routers){
+    //create nodes
+    routers[0].ipv4 = 0x20000;
+    routers[0].mask_len = 24;
+    routers[1].ipv4 = 0x21000;
+    routers[1].mask_len = 32;
+    routers[2].ipv4 = 0x22000;
+    routers[2].mask_len = 24;
+    routers[3].ipv4 = 0x23000;
+    routers[3].mask_len = 32;
+    routers[4].ipv4 = 0x24000;
+    routers[4].mask_len = 24;
+    
     Router_insertDEdge(routers, 0, 1, 2);
     Router_insertDEdge(routers, 0, 4, 4);
     Router_insertDEdge(routers, 1, 2, 5);
     Router_insertDEdge(routers, 2, 3, 2);
     Router_insertDEdge(routers, 3, 4, 1);
     Router_insertDEdge(routers, 4, 1, 3);
+    printf("Adjacency lists:\n");
     for(int i = 0; i < ROUTER_TOTAL; i++){
         Router_printNeighbors(routers[i].neighbors);
     }

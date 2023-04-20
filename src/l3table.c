@@ -9,7 +9,7 @@ static void insert_random_addrs(RouteNode **root, size_t n){
     //used for testing
     srand(time(NULL));
     for(size_t i = 0; i < n; i++){
-        RNode_insert(root, (uint32_t)rand(), rand()%32);
+        //RNode_insert(root, (uint32_t)rand(), rand()%32);
     }
 }
 
@@ -42,7 +42,11 @@ void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
         iaddr.s_addr = htonl(*prefix);
 
         inet_ntop(AF_INET, &iaddr, addr_str, INET_ADDRSTRLEN);
-        printf("-- %s/%d (%#x)\n", addr_str, length, newprefix);
+        printf("-- %s/%d (%#x)  |  %x/%d\n", 
+                addr_str, length, newprefix,
+                node->gateway,
+                node->gw_mask_len
+                );
         //printf("Subnet: %x/%d\n", newprefix, length);
     }
     for(int i = 0; i < BIT_TYPES; i++){   
@@ -68,9 +72,8 @@ RouteNode *RNode_create(void){
 }
 
 
-void RNode_insert(RouteNode **root, uint32_t addr, int mask_len){
+void RNode_insert(RouteNode **root, uint32_t addr, int mask_len, uint32_t gateway, uint8_t gw_mask_len){
     //TODO: parse address to 4 bytes
-    //TODO: insert gateway
     if(*root == NULL){
         *root = RNode_create();
     }
@@ -83,6 +86,8 @@ void RNode_insert(RouteNode **root, uint32_t addr, int mask_len){
         p = p->child[BIT(i,addr)];                   //go to new node
     }
     p->subnet_end = true;                              //mark end of string
+    p->gateway = gateway;
+    p->gw_mask_len = gw_mask_len;
 }
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in){

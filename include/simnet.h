@@ -14,14 +14,15 @@ typedef struct route_link{
     struct route_link *next;    //next neighbor in list
     int node_id;                //position in the list array
     size_t weight;              //weight to reach neighbor
+}RouteLink;
+
+struct Router{
     uint32_t ipv4;              //In this mini simulation, every 
                                 //router already know it's neighbors
                                 //IPv4 and MAC address in it's ARP
                                 //cache.
-}RouteLink;
-
-struct Router{
-    //int id;                     //position in the list array                    
+    uint8_t mask_len;
+    int id;                     //position in the list array                    
     RouteNode *Routing_table;   
     RouteLink *neighbors;       //adjacency list of neighbors
 };
@@ -37,8 +38,6 @@ void Router_insertNeighbor(RouteLink **neighborList, int id, int weight);
 
 void Router_printNeighbors(RouteLink *sPtr);
 
-void Router_SPF(struct Router *routers, int id);
-
 //Router will be stored in an array, where id is it's position, to
 //facilitate.
 //
@@ -50,8 +49,7 @@ void fill_all_tables(void);
 //call fill_table for each node
 
 void fill_table(struct Router *Router);
-//calls dijkstra for all the nodes in the topology
-//fiils routing table with the proper gateways
+//calls dijkstra and build routing table
 
 
 
