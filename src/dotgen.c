@@ -5,8 +5,8 @@ void Simnet_dotgen(struct Router *routers){
 
     Agnode_t *nodes[ROUTER_TOTAL];
     //fill nodes array with router nodes
-    char snum[8] = {0};
     for(int i = 0; i < ROUTER_TOTAL; i++){
+        char snum[8] = {0};
         sprintf(snum, "%d", i);
         nodes[i] = agnode(graph, snum, 1);   
     }
@@ -15,7 +15,10 @@ void Simnet_dotgen(struct Router *routers){
     for(int i = 0; i < ROUTER_TOTAL; i ++){
         RouteLink *p;
         for(p = routers[i].neighbors; p != NULL; p = p->next){  
-            agedge(graph, nodes[i], nodes[p->node_id], NULL, 1);
+            char snum[8] = {0};
+            sprintf(snum, "%lu", p->weight);
+            Agedge_t *e = agedge(graph, nodes[i], nodes[p->node_id], snum, 1);
+            agsafeset(e, "label", snum, "");
         }
     }
 
@@ -23,6 +26,7 @@ void Simnet_dotgen(struct Router *routers){
     agattr(graph, AGNODE, "style", "filled");
     agattr(graph, AGNODE, "fillcolor", "#030769");
     agattr(graph, AGNODE, "fontcolor", "#b1acc8");    
+    agattr(graph, AGEDGE, "fontcolor", "#b1acc8");    
     agattr(graph, AGNODE, "shape", "circle");       
     agattr(graph, AGEDGE, "color", "#64d967");       
     agattr(graph, AGNODE, "color", "#b2bfed");       

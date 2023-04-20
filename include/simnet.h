@@ -31,9 +31,9 @@ void Simnet_init(struct Router *routers);
 
 void Simnet_createGraph(struct Router *routers);
 
-void Router_insertDEdge(struct Router *routers, int id1, int id2);
+void Router_insertDEdge(struct Router *routers, int id1, int id2, int weight);
 
-void Router_insertNeighbor(RouteLink **neighborList, int id);
+void Router_insertNeighbor(RouteLink **neighborList, int id, int weight);
 
 void Router_printNeighbors(RouteLink *sPtr);
 
