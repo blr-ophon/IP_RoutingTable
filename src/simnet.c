@@ -29,11 +29,15 @@ int main(void){
     struct RN_addr_in addr_in;
     RNode_retrieve(routers[router_id].Routing_table, 0x0a010100, 32, &addr_in);
 
-    //print retrieved info
+    //print retrieved address
     iaddr.s_addr = htonl(addr_in.addr);
     inet_ntop(AF_INET, &iaddr, buf, INET_ADDRSTRLEN);
     printf("Retrieved: %s/%d\n", buf, addr_in.mask_len);
 
+    //print retrieved gateway 
+    iaddr.s_addr = htonl(addr_in.gateway);
+    inet_ntop(AF_INET, &iaddr, buf, INET_ADDRSTRLEN);
+    printf("Gateway: %s/%d\n", buf, addr_in.gw_mask_len);
 
     return 0;
 }

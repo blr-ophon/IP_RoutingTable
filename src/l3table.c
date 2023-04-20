@@ -66,42 +66,35 @@ void RNode_insert(RouteNode **root, uint32_t addr, int mask_len, uint32_t gatewa
 }
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in){
-    //added later
-    struct RN_addr_in tmp_addr_in;
-    struct RN_addr_in ret_addr_in;
-    memset(&tmp_addr_in, 0, sizeof(struct RN_addr_in));
-    memset(&ret_addr_in, 0, sizeof(struct RN_addr_in));
     //will be filled during the traversal
-    uint32_t tmp_addr = 0;
-    int tmp_mask_len = 0;
+    struct RN_addr_in tmp_addr_in;
+    memset(&tmp_addr_in, 0, sizeof(struct RN_addr_in));
 
-    //will be filled only when a subned_end flag is found
-    uint32_t ret_addr = 0;
-    int ret_mask_len = 0;
+    ////will be filled only when a subned_end flag is found
+    struct RN_addr_in ret_addr_in;
+    memset(&ret_addr_in, 0, sizeof(struct RN_addr_in));
 
     RouteNode *p = root;
     for(int i = 31; i >= (32-mask_len); i--){   //for each char in str, traverse
         if(p->subnet_end){
-            ret_addr = tmp_addr;
-            ret_mask_len = tmp_mask_len;
+            memcpy(&ret_addr_in, &tmp_addr_in, sizeof(struct RN_addr_in));
         }
         if(p->child[BIT(i,addr)] == NULL){   //and check if its present
-            addr_in->addr = ret_addr;
-            addr_in->mask_len= ret_mask_len;
+            memcpy(addr_in, &ret_addr_in, sizeof(struct RN_addr_in));
             return;
         }
-        tmp_mask_len++;
-        tmp_addr |= (BIT(i,addr) << i);
+
+        tmp_addr_in.mask_len ++;
+        tmp_addr_in.addr |= (BIT(i,addr) << i);
         p = p->child[BIT(i,addr)];
     }
-
     //if traversal is complete and there is an end flag
     if(p->subnet_end){
-        ret_addr = tmp_addr;
-        ret_mask_len = tmp_mask_len;
+        tmp_addr_in.gateway = p->gateway;
+        tmp_addr_in.gw_mask_len = p->gw_mask_len;
+        memcpy(&ret_addr_in, &tmp_addr_in, sizeof(struct RN_addr_in));
     }
-    addr_in->addr = ret_addr;
-    addr_in->mask_len= ret_mask_len;
+    memcpy(addr_in, &ret_addr_in, sizeof(struct RN_addr_in));
 }
 
 static bool RNode_hasChidren(RouteNode *node, BIT_TYPE exclude){
