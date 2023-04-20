@@ -1,14 +1,17 @@
-#include "net.h"
-#include <graphviz/gvc.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "dotgen.h"
+
+//gcc src/dotgen.c -g -o dotgen`pkg-config --cflags --libs libgvc` -I./include
 
 //weighted graph structs. Objective is:
 //calculate fastest route between two nodes
 //fill each node routing table  with proper gateways
 
+//int main(void){
+//    dotgen();
+//    return 0;
+//}
 
-int main(void) {
+void dotgen(void) {
     //cgraph
     Agraph_t *graph = agopen("G", Agdirected, NULL);
 
@@ -31,12 +34,11 @@ int main(void) {
 
 
     //generate .dot file
-    FILE *f = fopen("graph.dot", "w");    
+    FILE *f = fopen("./dot/graph.dot", "w");    
     agwrite(graph, f);
     fclose(f);
-    system("dot -Tpng -o graph.png graph.dot");  
+    system("dot -Tpng -o ./dot/graph.png ./dot/graph.dot");  
 
     agclose(graph);
-    return 0;
 }
 

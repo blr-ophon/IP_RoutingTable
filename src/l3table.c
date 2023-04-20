@@ -13,24 +13,24 @@ static void insert_random_addrs(RouteNode **root, size_t n){
     }
 }
 
-int main(void){
-    RouteNode *root = NULL;
-    insert_random_addrs(&root, 128);
-    RNode_insert(&root, 0xff000000, 4);
-    RNode_delete(&root, 0xff000000, 4);
-
-    RNode_print(root);
-
-    struct RN_addr_in addr_in;
-    memset(&addr_in, 0, sizeof(addr_in));
-    RNode_retrieve(root, 0x2f000000, 7, &addr_in);
-    printf("Retrieved: %x/%d\n", addr_in.addr, addr_in.mask_len);
-
-    if(RNode_search(root, 0xff000000, 4)){
-        printf("Found\n");
-    }
-    return 0;
-}
+//int main(void){
+//    RouteNode *root = NULL;
+//    insert_random_addrs(&root, 128);
+//    RNode_insert(&root, 0xff000000, 4);
+//    RNode_delete(&root, 0xff000000, 4);
+//
+//    RNode_print(root);
+//
+//    struct RN_addr_in addr_in;
+//    memset(&addr_in, 0, sizeof(addr_in));
+//    RNode_retrieve(root, 0x2f000000, 7, &addr_in);
+//    printf("Retrieved: %x/%d\n", addr_in.addr, addr_in.mask_len);
+//
+//    if(RNode_search(root, 0xff000000, 4)){
+//        printf("Found\n");
+//    }
+//    return 0;
+//}
 
 
 void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
