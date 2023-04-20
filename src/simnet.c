@@ -7,22 +7,23 @@ int main(void){
     struct Router routers[ROUTER_TOTAL];
     Simnet_init(routers);
     Simnet_createGraph(routers);
-    Router_SPF(routers, 0);
+    Simnet_fillTables(routers);
     return 0;
 }
 
 //create a sample graph
 void Simnet_createGraph(struct Router *routers){
     //create nodes
-    routers[0].ipv4 = 0x20000;
+    //10.1.1.0 = 0x0a010100
+    routers[0].ipv4 = 0x0a000100;
     routers[0].mask_len = 24;
-    routers[1].ipv4 = 0x21000;
+    routers[1].ipv4 = 0x0a010100;
     routers[1].mask_len = 32;
-    routers[2].ipv4 = 0x22000;
+    routers[2].ipv4 = 0x0a020100;
     routers[2].mask_len = 24;
-    routers[3].ipv4 = 0x23000;
+    routers[3].ipv4 = 0x0a030100;
     routers[3].mask_len = 32;
-    routers[4].ipv4 = 0x24000;
+    routers[4].ipv4 = 0x0a040100;
     routers[4].mask_len = 24;
     
     Router_insertDEdge(routers, 0, 1, 2);
@@ -31,16 +32,24 @@ void Simnet_createGraph(struct Router *routers){
     Router_insertDEdge(routers, 2, 3, 2);
     Router_insertDEdge(routers, 3, 4, 1);
     Router_insertDEdge(routers, 4, 1, 3);
-    printf("Adjacency lists:\n");
-    for(int i = 0; i < ROUTER_TOTAL; i++){
-        Router_printNeighbors(routers[i].neighbors);
-    }
+    //printf("Adjacency lists:\n");
+    //for(int i = 0; i < ROUTER_TOTAL; i++){
+    //    Router_printNeighbors(routers[i].neighbors);
+    //}
     Simnet_dotgen(routers);
 }
 
 void Simnet_init(struct Router *routers){
     for(int i = 0; i < ROUTER_TOTAL; i++){
         memset(&routers[i], 0, sizeof(struct Router));
+    }
+}
+
+void Simnet_fillTables(struct Router *routers){
+    //fill l3 routing table of all routers
+    for(int i = 0; i < ROUTER_TOTAL; i++){
+        printf("\nRouter %d IPv4 Routing Table:\n", i);
+        Router_SPF(routers, i);
     }
 }
 

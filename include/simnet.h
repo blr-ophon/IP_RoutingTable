@@ -28,9 +28,12 @@ struct Router{
 };
 
 
+
 void Simnet_init(struct Router *routers);
 
 void Simnet_createGraph(struct Router *routers);
+
+void Simnet_fillTables(struct Router *routers);
 
 void Router_insertDEdge(struct Router *routers, int id1, int id2, int weight);
 
@@ -43,56 +46,6 @@ void Router_printNeighbors(RouteLink *sPtr);
 //
 //The ideal would be a hash table, where id can be any number, like MAC
 //address
-
-void fill_all_tables(void);
-//Each node knows all of the topology from LSDB.
-//call fill_table for each node
-
-void fill_table(struct Router *Router);
-//calls dijkstra and build routing table
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void lsp_exchange(void);
-//once the graph is initialized, every node will have a basic routing
-//table consisting solely of their neighbors (from assumed ARP cache).
-//For each neighbor of node_id, send routing table to neighbor
-//for(int i = 0; i < 8; i ++){
-//  for(p = router.neighbors; p != NULL; p = p->next){
-//      send_rtable(i, p->id); 
-//  }
-//}
-
-void send_rtable(int src_id, int dst_id);
-//assert dst_id is in src_id neighbor list
-//get routers[src_id].Routing_table and update...
-//...routers[dst_id].Routing_table based on that
-//for(each node in src_id table){
-//  gateway = src_id.address;
-//  insert(dst_id table, address, mask_len, gateway);
-//  TODO: what about multiple gateways for an address?
-//}
 
 
 #endif

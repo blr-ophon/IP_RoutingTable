@@ -5,49 +5,23 @@ static bool BIT(uint8_t bit_n, uint32_t addr){
     return (addr & (1 << bit_n));
 }
 
-static void insert_random_addrs(RouteNode **root, size_t n){
-    //used for testing
-    srand(time(NULL));
-    for(size_t i = 0; i < n; i++){
-        //RNode_insert(root, (uint32_t)rand(), rand()%32);
-    }
-}
-
-//int main(void){
-//    RouteNode *root = NULL;
-//    insert_random_addrs(&root, 128);
-//    RNode_insert(&root, 0xff000000, 4);
-//    RNode_delete(&root, 0xff000000, 4);
-//
-//    RNode_print(root);
-//
-//    struct RN_addr_in addr_in;
-//    memset(&addr_in, 0, sizeof(addr_in));
-//    RNode_retrieve(root, 0x2f000000, 7, &addr_in);
-//    printf("Retrieved: %x/%d\n", addr_in.addr, addr_in.mask_len);
-//
-//    if(RNode_search(root, 0xff000000, 4)){
-//        printf("Found\n");
-//    }
-//    return 0;
-//}
-
-
 void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
 
     uint32_t newprefix = *prefix;
     if(node->subnet_end){
         char addr_str[INET_ADDRSTRLEN] = {0};
+        char gateway_str[INET_ADDRSTRLEN] = {0};
         struct in_addr iaddr;
-        iaddr.s_addr = htonl(*prefix);
 
+        //convert address and gateway to presentation format
+        iaddr.s_addr = htonl(*prefix);
         inet_ntop(AF_INET, &iaddr, addr_str, INET_ADDRSTRLEN);
-        printf("-- %s/%d (%#x)  |  %x/%d\n", 
-                addr_str, length, newprefix,
-                node->gateway,
-                node->gw_mask_len
-                );
-        //printf("Subnet: %x/%d\n", newprefix, length);
+        iaddr.s_addr = htonl(node->gateway);
+        inet_ntop(AF_INET, &iaddr, gateway_str, INET_ADDRSTRLEN);
+
+        printf("%s/%d  |%10s/%d\n", addr_str, length,
+                gateway_str,
+                node->gw_mask_len);
     }
     for(int i = 0; i < BIT_TYPES; i++){   
         if(node->child[i] != NULL){
@@ -58,6 +32,7 @@ void RNode_printrec(RouteNode *node, uint32_t *prefix, int length){
 }
 
 void RNode_print(RouteNode *root){
+    printf("%-20s%-20s\n", "SUBNET", "GATEWAY");
     if(root == NULL){
         printf("Empty trie\n");
         return;

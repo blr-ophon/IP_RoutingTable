@@ -69,14 +69,14 @@ void Router_SPF(struct Router *routers, int start_id){
             }
         }
     }
-    printf("\nDIJKSTRA'S ALGORITHM TABLE\n");
-    for(int i = 0; i < ROUTER_TOTAL; i++){
-        printf("%d | %d | %d\n",
-                i,
-                dist_table[i].dist_to_id,
-                dist_table[i].pv_node
-              );
-    }
+    //printf("\nDIJKSTRA'S ALGORITHM TABLE\n");
+    //for(int i = 0; i < ROUTER_TOTAL; i++){
+    //    printf("%d | %d | %d\n",
+    //            i,
+    //            dist_table[i].dist_to_id,
+    //            dist_table[i].pv_node
+    //          );
+    //}
 
     //Fill routing table
     SPF_fillL3Table(routers, dist_table, start_id);
