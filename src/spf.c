@@ -12,7 +12,7 @@ void SPF_fillL3Table(struct Router *routers, struct table_entry *dist_table, int
         }
 
         uint32_t gateway = routers[tmp_i].ipv4;
-        uint32_t gw_mask_len = routers[dist_table[i].pv_node].mask_len;
+        uint32_t gw_mask_len = routers[tmp_i].mask_len;
         RNode_insert(&rtable, routers[i].ipv4, routers[i].mask_len, gateway, gw_mask_len);
     }
     RNode_print(rtable);
