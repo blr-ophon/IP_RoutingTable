@@ -11,10 +11,11 @@ void Simnet_dotgen(struct Router *routers){
         nodes[i] = agnode(graph, snum, 1);   
 
         //Address label on nodes
-        char addr_str[INET_ADDRSTRLEN] = {0};
+        char addr_str[INET_ADDRSTRLEN + 3] = {0};
         struct in_addr iaddr;
         iaddr.s_addr = htonl(routers[i].ipv4);
         inet_ntop(AF_INET, &iaddr, addr_str, INET_ADDRSTRLEN);
+        sprintf(&addr_str[strlen(addr_str)], "/%d", routers[i].mask_len);
         agsafeset(nodes[i], "xlabel", addr_str , "");
     }
 
