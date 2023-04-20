@@ -37,6 +37,8 @@ void Router_insertNeighbor(RouteLink **neighborList, int id, int weight);
 
 void Router_printNeighbors(RouteLink *sPtr);
 
+void Router_SPF(struct Router *routers, int id);
+
 //Router will be stored in an array, where id is it's position, to
 //facilitate.
 //
@@ -50,16 +52,6 @@ void fill_all_tables(void);
 void fill_table(struct Router *Router);
 //calls dijkstra for all the nodes in the topology
 //fiils routing table with the proper gateways
-
-void shortest_path(void);
-//dijkstra algorithm 
-
-void bfs(void);
-//breadth-first search for dijkstra
-
-void graph_init(void);
-//insert all neighbors in adjacency list
-//call graph print in dotgen
 
 
 
