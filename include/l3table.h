@@ -19,6 +19,8 @@ typedef enum{
 struct RN_addr_in{
     uint32_t addr;
     uint8_t mask_len;
+    uint32_t gateway;
+    uint8_t gw_mask_len;
 };
 
 typedef struct route_node{

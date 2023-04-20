@@ -2,12 +2,39 @@
 #include "dotgen.h"
 #include "spf.h"
 
+#define BUF_SIZE 32
 
 int main(void){
     struct Router routers[ROUTER_TOTAL];
     Simnet_init(routers);
     Simnet_createGraph(routers);
     Simnet_fillTables(routers);
+
+    //prompt for retrieval
+    int router_id;
+    uint32_t address;
+
+    char buf[BUF_SIZE];
+    printf("Enter Router ID:\n");
+    fgets(buf, BUF_SIZE, stdin);
+    router_id = atoi(buf);
+
+    printf("Enter IPv4 Address: (ddd.ddd.ddd.ddd)\n");
+    fgets(buf, BUF_SIZE, stdin);
+    //convert buf string to in_addr
+    struct in_addr iaddr;
+    inet_pton(AF_INET, buf, &iaddr);
+
+    //retrieve address and store retrieved info in addr_in
+    struct RN_addr_in addr_in;
+    RNode_retrieve(routers[router_id].Routing_table, 0x0a010100, 32, &addr_in);
+
+    //print retrieved info
+    iaddr.s_addr = htonl(addr_in.addr);
+    inet_ntop(AF_INET, &iaddr, buf, INET_ADDRSTRLEN);
+    printf("Retrieved: %s/%d\n", buf, addr_in.mask_len);
+
+
     return 0;
 }
 

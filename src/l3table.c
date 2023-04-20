@@ -66,6 +66,11 @@ void RNode_insert(RouteNode **root, uint32_t addr, int mask_len, uint32_t gatewa
 }
 
 void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr_in *addr_in){
+    //added later
+    struct RN_addr_in tmp_addr_in;
+    struct RN_addr_in ret_addr_in;
+    memset(&tmp_addr_in, 0, sizeof(struct RN_addr_in));
+    memset(&ret_addr_in, 0, sizeof(struct RN_addr_in));
     //will be filled during the traversal
     uint32_t tmp_addr = 0;
     int tmp_mask_len = 0;

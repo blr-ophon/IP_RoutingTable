@@ -1,6 +1,7 @@
 #include "spf.h"
 
 void SPF_fillL3Table(struct Router *routers, struct table_entry *dist_table, int id){
+    routers[id].Routing_table = RNode_create();
     RouteNode *rtable = routers[id].Routing_table;
     for(int i = 0; i < ROUTER_TOTAL; i++){
 
