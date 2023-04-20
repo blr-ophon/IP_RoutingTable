@@ -47,5 +47,4 @@ void Router_printNeighbors(RouteLink *sPtr);
 //The ideal would be a hash table, where id can be any number, like MAC
 //address
 
-
 #endif

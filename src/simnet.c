@@ -15,24 +15,27 @@ int main(void){
     uint32_t address;
 
     char buf[BUF_SIZE];
-    printf("Enter Router ID:\n");
+    printf("\nEnter Router ID:\n");
     fgets(buf, BUF_SIZE, stdin);
     router_id = atoi(buf);
 
     printf("Enter IPv4 Address: (ddd.ddd.ddd.ddd)\n");
     fgets(buf, BUF_SIZE, stdin);
+    buf[strcspn(buf, "\n")] = 0;    //remove \n
+                                    
+                                    
     //convert buf string to in_addr
     struct in_addr iaddr;
     inet_pton(AF_INET, buf, &iaddr);
 
     //retrieve address and store retrieved info in addr_in
     struct RN_addr_in addr_in;
-    RNode_retrieve(routers[router_id].Routing_table, 0x0a010100, 32, &addr_in);
+    RNode_retrieve(routers[router_id].Routing_table, ntohl(iaddr.s_addr), 32, &addr_in);
 
     //print retrieved address
     iaddr.s_addr = htonl(addr_in.addr);
     inet_ntop(AF_INET, &iaddr, buf, INET_ADDRSTRLEN);
-    printf("Retrieved: %s/%d\n", buf, addr_in.mask_len);
+    printf("\nRetrieved: %s/%d\n", buf, addr_in.mask_len);
 
     //print retrieved gateway 
     iaddr.s_addr = htonl(addr_in.gateway);
