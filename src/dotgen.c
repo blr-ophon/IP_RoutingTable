@@ -31,10 +31,10 @@ void Simnet_dotgen(struct Router *routers){
 
 
     //generate .dot file
-    FILE *f = fopen("./dot/graph2.dot", "w");    
+    system("mkdir -p ./dot");
+    FILE *f = fopen("./dot/graph.dot", "w");    
     agwrite(graph, f);
     fclose(f);
-    system("mkdir -p ./dot");
     system("dot -Tpng -o ./dot/graph.png ./dot/graph.dot");  
 
     agclose(graph);
