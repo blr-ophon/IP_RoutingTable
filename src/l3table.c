@@ -87,6 +87,8 @@ void RNode_retrieve(RouteNode *root, uint32_t addr, int mask_len, struct RN_addr
         tmp_addr_in.mask_len ++;
         tmp_addr_in.addr |= (BIT(i,addr) << i);
         p = p->child[BIT(i,addr)];
+        tmp_addr_in.gateway = p->gateway;
+        tmp_addr_in.gw_mask_len = p->gw_mask_len;
     }
     //if traversal is complete and there is an end flag
     if(p->subnet_end){
