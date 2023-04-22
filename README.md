@@ -13,7 +13,6 @@ Topology visualization is generated as png with graphviz and dot in the 'dot' fo
 <img src='./misc/graph.png'>
 
 
-```
     Router 0 IPv4 Routing Table:
     SUBNET              GATEWAY
     10.0.1.0/24  |  10.0.1.0/24
@@ -55,11 +54,11 @@ Topology visualization is generated as png with graphviz and dot in the 'dot' fo
     10.4.1.0/24  |  10.4.1.0/24
 
     Enter Router ID:
-    1
+    3
     Enter IPv4 Address: (ddd.ddd.ddd.ddd)
-    10.3.1.0
+    10.0.1.127
 
-    Retrieved: 10.3.1.0/32
+    Retrieved: 10.0.1.0/24
     Gateway: 10.4.1.0/24
 ```
 
