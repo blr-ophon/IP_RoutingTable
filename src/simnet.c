@@ -5,6 +5,7 @@
 #define BUF_SIZE 32
 
 int main(void){
+    //generate topology and fill routing tables
     struct Router routers[ROUTER_TOTAL];
     Simnet_init(routers);
     Simnet_createGraph(routers);
@@ -12,7 +13,7 @@ int main(void){
 
     //prompt for retrieval
     int router_id;
-    uint32_t address;
+    struct in_addr iaddr;
 
     char buf[BUF_SIZE];
     printf("\nEnter Router ID:\n");
@@ -22,11 +23,7 @@ int main(void){
     printf("Enter IPv4 Address: (ddd.ddd.ddd.ddd)\n");
     fgets(buf, BUF_SIZE, stdin);
     buf[strcspn(buf, "\n")] = 0;    //remove \n
-                                    
-                                    
-    //convert buf string to in_addr
-    struct in_addr iaddr;
-    inet_pton(AF_INET, buf, &iaddr);
+    inet_pton(AF_INET, buf, &iaddr); //convert buf string to in_addr
 
     //retrieve address and store retrieved info in addr_in
     struct RN_addr_in addr_in;
@@ -87,7 +84,7 @@ void Simnet_fillTables(struct Router *routers){
     }
 }
 
-//Insert double edge
+//Insert edge in both ways
 void Router_insertDEdge(struct Router *routers, int id1, int id2, int weight){
     Router_insertNeighbor(&routers[id1].neighbors, id2, weight);
     Router_insertNeighbor(&routers[id2].neighbors, id1, weight);
